@@ -61,7 +61,6 @@
           <span class="nav-label">Email Drafts</span>
           <span class="nav-badge" id="emails-count">0</span>
         </button>
-
         <div class="nav-divider"></div>
 
         <button class="nav-item" data-tab="settings" id="nav-settings">
@@ -437,6 +436,7 @@
         </div>
       </section>
 
+
       <!-- Settings Tab -->
       <section class="tab-content" id="tab-settings">
         <div class="tab-header">
@@ -477,15 +477,31 @@
           </div>
 
           <div class="settings-card glass-card">
-            <h3>🔑 API Keys (Optional)</h3>
-            <p class="settings-desc">For enhanced AI-powered content generation</p>
+            <h3>🔑 API Keys & AI Provider</h3>
+            <p class="settings-desc">Choose your AI provider for generation and chatbot</p>
             <div class="form-grid">
+              <div class="field-group" style="grid-column: 1 / -1;">
+                <label for="settings-ai-provider">Active Provider</label>
+                <select id="settings-ai-provider" class="text-input">
+                  <option value="openai">OpenAI (GPT-4o Mini)</option>
+                  <option value="gemini">Google Gemini (Free tier available)</option>
+                  <option value="openrouter">OpenRouter (Access to free models)</option>
+                </select>
+              </div>
               <div class="field-group">
                 <label for="settings-openai-key">OpenAI API Key</label>
                 <input type="password" id="settings-openai-key" class="text-input" placeholder="sk-..." />
               </div>
+              <div class="field-group">
+                <label for="settings-gemini-key">Gemini API Key</label>
+                <input type="password" id="settings-gemini-key" class="text-input" placeholder="AIza..." />
+              </div>
+              <div class="field-group" style="grid-column: 1 / -1;">
+                <label for="settings-openrouter-key">OpenRouter API Key</label>
+                <input type="password" id="settings-openrouter-key" class="text-input" placeholder="sk-or-v1-..." />
+              </div>
             </div>
-            <button class="btn btn-secondary" id="save-api-keys-btn">💾 Save API Keys</button>
+            <button class="btn btn-secondary" id="save-api-keys-btn">💾 Save AI Settings</button>
           </div>
 
           <div class="settings-card glass-card">
@@ -501,6 +517,50 @@
         </div>
       </section>
     </main>
+  </div>
+
+  <!-- AI Advisor Floating Drawer -->
+  <button id="advisor-fab" class="advisor-fab" title="Chat with AI Advisor">
+    🤖
+  </button>
+  
+  <div id="advisor-drawer" class="advisor-drawer glass-card">
+    <div class="drawer-header">
+      <h2>AI Career Advisor</h2>
+      <button class="btn btn-ghost" id="advisor-close-btn" style="padding: 0 0.5rem;">✖</button>
+    </div>
+    
+    <div class="drawer-context">
+      <div class="field-group">
+        <label for="advisor-job-select" style="font-size: 0.8rem;">Target Job Context</label>
+        <select id="advisor-job-select" class="filter-select" style="width: 100%;">
+          <option value="">No job selected (General Advice)</option>
+        </select>
+      </div>
+      <div class="context-status" style="padding: 0.5rem; margin-top: 0.5rem;">
+        <div class="status-item" id="advisor-resume-status">
+          <span class="status-icon">❌</span> Resume not found
+        </div>
+        <div class="status-item" id="advisor-job-status">
+          <span class="status-icon">ℹ️</span> General advice mode
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-sm" id="advisor-clear-btn" style="width: 100%; margin-top: 0.5rem;">🗑️ Clear Chat</button>
+    </div>
+
+    <div class="drawer-chat-area">
+      <div class="chat-messages" id="advisor-messages">
+        <div class="chat-message ai">
+          <div class="message-content">Hi! I'm your AI Career Advisor. Select a target job above, or just ask me for general career advice!</div>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <textarea id="advisor-input" placeholder="Ask for advice..."></textarea>
+        <button class="btn btn-primary" id="advisor-send-btn">
+          <span class="btn-icon">➤</span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Toast Notifications -->

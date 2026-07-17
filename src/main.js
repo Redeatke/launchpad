@@ -5,6 +5,7 @@ import { initCoverLetterTab, genCoverLetterForJob } from './modules/coverLetter.
 import { initProjectsTab } from './modules/projectSuggester.js';
 import { initContactsTab } from './modules/apolloContacts.js';
 import { initEmailTab, draftEmailForJob, draftEmailForContact } from './modules/emailDrafter.js';
+import { initChatbotTab } from './modules/chatbot.js';
 import { initSettings } from './modules/settings.js';
 import { getJobById, getAllCachedJobs } from './modules/jobsFetcher.js';
 import { storage } from './utils/storage.js';
@@ -82,6 +83,12 @@ function renderDashboard() {
       <div class="dash-card-label">Email Drafts</div>
       <div class="dash-card-sub">Ready to send</div>
     </div>
+    <div class="dash-card" data-goto="advisor">
+      <div class="dash-card-icon">🤖</div>
+      <div class="dash-card-value">AI</div>
+      <div class="dash-card-label">Career Advisor</div>
+      <div class="dash-card-sub">Chat and get advice</div>
+    </div>
     <div class="dash-card" data-goto="projects">
       <div class="dash-card-icon">💡</div>
       <div class="dash-card-value">16</div>
@@ -99,7 +106,14 @@ function renderDashboard() {
 
   grid.classList.add('stagger-enter');
   grid.querySelectorAll('.dash-card[data-goto]').forEach(card => {
-    card.addEventListener('click', () => switchTab(card.dataset.goto));
+    card.addEventListener('click', () => {
+      const target = card.dataset.goto;
+      if (target === 'advisor') {
+        document.getElementById('advisor-fab').click();
+      } else {
+        switchTab(target);
+      }
+    });
   });
 }
 
@@ -153,6 +167,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initProjectsTab();
   initContactsTab();
   initEmailTab();
+  initChatbotTab();
   
   // Load tracker
   await initTracker();

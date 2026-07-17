@@ -52,14 +52,22 @@ function updateUserDisplay(profile) {
 }
 
 function saveApiKeys() {
-  const keys = { openai: document.getElementById('settings-openai-key').value };
+  const keys = {
+    provider: document.getElementById('settings-ai-provider').value,
+    openai: document.getElementById('settings-openai-key').value,
+    gemini: document.getElementById('settings-gemini-key').value,
+    openrouter: document.getElementById('settings-openrouter-key').value
+  };
   storage.set('api_keys', keys);
-  window.__showToast?.('API keys saved!', 'success');
+  window.__showToast?.('AI Settings saved!', 'success');
 }
 
 function loadApiKeys() {
   const keys = storage.get('api_keys', {});
+  document.getElementById('settings-ai-provider').value = keys.provider || 'openai';
   document.getElementById('settings-openai-key').value = keys.openai || '';
+  document.getElementById('settings-gemini-key').value = keys.gemini || '';
+  document.getElementById('settings-openrouter-key').value = keys.openrouter || '';
 }
 
 function exportData() {

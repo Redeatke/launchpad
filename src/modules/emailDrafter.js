@@ -4,7 +4,7 @@ import { storage } from '../utils/storage.js';
 import { getJobById, getAllCachedJobs } from './jobsFetcher.js';
 import { getContacts, getContactById } from './apolloContacts.js';
 import { getResumeText } from './resumeManager.js';
-import { callOpenAI, getOpenAIKey } from '../utils/openai.js';
+import { callAI, getAIKeys } from '../utils/ai.js';
 import { esc } from '../utils/dom.js';
 
 const DRAFTS_KEY = 'email_drafts';
@@ -193,9 +193,19 @@ export function draftEmailForContact(contactId) {
 }
 
 async function generateAIEmail() {
-  const apiKey = getOpenAIKey();
-  if (!apiKey) {
+  const keys = getAIKeys();
+  if (keys.provider === 'openai' && !keys.openai) {
     window.__showToast?.('Please enter your OpenAI API key in the Settings tab first!', 'error');
+    window.__switchTab?.('settings');
+    return;
+  }
+  if (keys.provider === 'gemini' && !keys.gemini) {
+    window.__showToast?.('Please enter your Gemini API key in the Settings tab first!', 'error');
+    window.__switchTab?.('settings');
+    return;
+  }
+  if (keys.provider === 'openrouter' && !keys.openrouter) {
+    window.__showToast?.('Please enter your OpenRouter API key in the Settings tab first!', 'error');
     window.__switchTab?.('settings');
     return;
   }
@@ -258,7 +268,7 @@ ${resumeText}
 
 Please draft the outreach email tailored to this scenario.`;
 
-    const result = await callOpenAI(systemPrompt, userPrompt);
+    const result = await callAI(systemPrompt, userPrompt);
     
     // Parse the Subject and Body from the response
     const subjectMatch = result.match(/^Subject:\s*(.+)$/m);

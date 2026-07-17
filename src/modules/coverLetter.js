@@ -3,7 +3,7 @@ import { coverLetterTemplates } from '../utils/templates.js';
 import { storage } from '../utils/storage.js';
 import { getJobById, getAllCachedJobs } from './jobsFetcher.js';
 import { getResumeText } from './resumeManager.js';
-import { callOpenAI, getOpenAIKey } from '../utils/openai.js';
+import { callAI, getAIKeys } from '../utils/ai.js';
 import { esc } from '../utils/dom.js';
 
 const DRAFTS_KEY = 'coverletter_drafts';
@@ -173,9 +173,19 @@ export function genCoverLetterForJob(jobId) {
 }
 
 async function generateAICoverLetter() {
-  const apiKey = getOpenAIKey();
-  if (!apiKey) {
+  const keys = getAIKeys();
+  if (keys.provider === 'openai' && !keys.openai) {
     window.__showToast?.('Please enter your OpenAI API key in the Settings tab first!', 'error');
+    window.__switchTab?.('settings');
+    return;
+  }
+  if (keys.provider === 'gemini' && !keys.gemini) {
+    window.__showToast?.('Please enter your Gemini API key in the Settings tab first!', 'error');
+    window.__switchTab?.('settings');
+    return;
+  }
+  if (keys.provider === 'openrouter' && !keys.openrouter) {
+    window.__showToast?.('Please enter your OpenRouter API key in the Settings tab first!', 'error');
     window.__switchTab?.('settings');
     return;
   }
@@ -226,7 +236,7 @@ ${resumeText}
 
 Please write a custom cover letter tailored to this job and highlighting the most relevant skills/experiences from the resume.`;
 
-    const result = await callOpenAI(systemPrompt, userPrompt);
+    const result = await callAI(systemPrompt, userPrompt);
     textarea.value = result;
     window.__showToast?.('AI Cover Letter generated successfully!', 'success');
   } catch (err) {
