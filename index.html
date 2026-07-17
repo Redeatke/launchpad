@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="LaunchPad — Your AI-powered job application assistant. Aggregate roles, tailor resumes, generate cover letters, and draft outreach emails." />
+  <title>LaunchPad — Job Application Assistant</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/styles/main.css" />
+  <link rel="stylesheet" href="/src/styles/components.css" />
+  <link rel="stylesheet" href="/src/styles/animations.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <span class="logo-icon">🚀</span>
+          <h1 class="logo-text">LaunchPad</h1>
+        </div>
+        <p class="logo-subtitle">Job Application Assistant</p>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-tab="dashboard" id="nav-dashboard">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Dashboard</span>
+        </button>
+        <button class="nav-item" data-tab="jobs" id="nav-jobs">
+          <span class="nav-icon">💼</span>
+          <span class="nav-label">Job Listings</span>
+          <span class="nav-badge" id="jobs-count">0</span>
+        </button>
+        <button class="nav-item" data-tab="tracker" id="nav-tracker">
+          <span class="nav-icon">📅</span>
+          <span class="nav-label">Tracker</span>
+          <span class="nav-badge" id="tracker-count">0</span>
+        </button>
+        <button class="nav-item" data-tab="resume" id="nav-resume">
+          <span class="nav-icon">📄</span>
+          <span class="nav-label">Resume</span>
+        </button>
+        <button class="nav-item" data-tab="coverletters" id="nav-coverletters">
+          <span class="nav-icon">✉️</span>
+          <span class="nav-label">Cover Letters</span>
+          <span class="nav-badge" id="coverletters-count">0</span>
+        </button>
+        <button class="nav-item" data-tab="projects" id="nav-projects">
+          <span class="nav-icon">💡</span>
+          <span class="nav-label">Projects</span>
+        </button>
+        <button class="nav-item" data-tab="contacts" id="nav-contacts">
+          <span class="nav-icon">👤</span>
+          <span class="nav-label">Contacts</span>
+          <span class="nav-badge" id="contacts-count">0</span>
+        </button>
+        <button class="nav-item" data-tab="emails" id="nav-emails">
+          <span class="nav-icon">📧</span>
+          <span class="nav-label">Email Drafts</span>
+          <span class="nav-badge" id="emails-count">0</span>
+        </button>
+
+        <div class="nav-divider"></div>
+
+        <button class="nav-item" data-tab="settings" id="nav-settings">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Settings</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-info" id="user-info">
+          <div class="user-avatar">👤</div>
+          <div class="user-details">
+            <span class="user-name" id="user-name">Set up profile</span>
+            <span class="user-email" id="user-email">Settings → Profile</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Mobile Header -->
+    <header class="mobile-header" id="mobile-header">
+      <button class="hamburger" id="hamburger-btn">
+        <span></span><span></span><span></span>
+      </button>
+      <span class="mobile-logo">🚀 LaunchPad</span>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" id="main-content">
+      <!-- Dashboard Tab -->
+      <section class="tab-content active" id="tab-dashboard">
+        <div class="tab-header">
+          <h2>Dashboard</h2>
+          <p class="tab-description">Your job search at a glance</p>
+        </div>
+        <div class="dashboard-grid" id="dashboard-grid">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- Jobs Tab -->
+      <section class="tab-content" id="tab-jobs">
+        <div class="tab-header">
+          <div class="tab-header-row">
+            <div>
+              <h2>Job Listings</h2>
+              <p class="tab-description">Aggregated from top GitHub repos</p>
+            </div>
+            <button class="btn btn-primary" id="refresh-jobs-btn">
+              <span class="btn-icon">🔄</span> Refresh Jobs
+            </button>
+          </div>
+          <div class="filters-bar" id="jobs-filters">
+            <div class="search-wrapper">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="jobs-search" class="search-input" placeholder="Search companies, roles, locations..." />
+            </div>
+            <select id="filter-role" class="filter-select">
+              <option value="">All Roles</option>
+              <option value="Software Engineer">Software Engineer</option>
+              <option value="Product Manager">Product Manager</option>
+              <option value="Data Scientist">Data Scientist</option>
+              <option value="Quant">Quant</option>
+              <option value="DevOps">DevOps</option>
+              <option value="Frontend">Frontend</option>
+              <option value="Backend">Backend</option>
+              <option value="Full Stack">Full Stack</option>
+              <option value="ML">ML/AI</option>
+            </select>
+            <select id="filter-status" class="filter-select">
+              <option value="">All Status</option>
+              <option value="open">Open</option>
+              <option value="closed">Closed</option>
+            </select>
+            <select id="filter-source" class="filter-select">
+              <option value="">All Sources</option>
+              <option value="New-Grad-2027">New-Grad-2027</option>
+              <option value="SimplifyJobs">SimplifyJobs</option>
+              <option value="Summer2025">Summer2025</option>
+              <option value="Fall2025">Fall2025</option>
+            </select>
+            <div class="checkbox-wrapper" style="display:flex; align-items:center; gap:0.5rem; margin-left: 0.5rem; color: var(--text-secondary); white-space: nowrap;">
+              <input type="checkbox" id="filter-us-only" />
+              <label for="filter-us-only">🇺🇸 US Jobs Only</label>
+            </div>
+          </div>
+        </div>
+        <div class="jobs-status-bar" id="jobs-status-bar">
+          <span id="jobs-result-count">Loading jobs...</span>
+        </div>
+        <div class="jobs-grid" id="jobs-grid">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- Tracker Tab -->
+      <section class="tab-content" id="tab-tracker">
+        <div class="tab-header">
+          <div class="tab-header-row">
+            <div>
+              <h2>Application Tracker</h2>
+              <p class="tab-description">Keep track of your internship & job applications</p>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-primary" id="add-app-btn">
+                <span class="btn-icon">➕</span> Add Application
+              </button>
+              <button class="btn btn-secondary" id="import-tracker-btn">
+                <span class="btn-icon">📥</span> Import Excel/CSV
+              </button>
+              <input type="file" id="tracker-file-input" accept=".csv,.xlsx" hidden />
+              <button class="btn btn-ghost" id="export-tracker-btn">📤 Export CSV</button>
+            </div>
+          </div>
+
+          <!-- Stats Summary Bar -->
+          <div class="tracker-stats-bar" id="tracker-stats-bar">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Filters & Search Bar -->
+          <div class="filters-bar" id="tracker-filters">
+            <div class="search-wrapper">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="tracker-search" class="search-input" placeholder="Search companies, roles, notes..." />
+            </div>
+            <select id="filter-tracker-response" class="filter-select">
+              <option value="">All Responses</option>
+              <option value="Nothing Yet">Nothing Yet</option>
+              <option value="Interviewing">Interviewing</option>
+              <option value="Offer">Offer</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Ghosted">Ghosted</option>
+            </select>
+            <select id="filter-tracker-offer" class="filter-select">
+              <option value="">All Offers</option>
+              <option value="Yes">Offer Received</option>
+              <option value="No">No / Pending</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- AI Quick Import / Paste Panel -->
+        <div class="quick-import-panel glass-card" style="margin-bottom: 1.5rem; padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <h3 style="font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-accent); margin: 0;">
+              <span>💡</span> AI Quick Import (Handshake, LinkedIn, etc.)
+            </h3>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">Paste raw job text or details</span>
+          </div>
+          <div style="display: flex; gap: 1rem; align-items: flex-start;">
+            <textarea id="quick-import-text" class="text-input" style="flex: 1; height: 80px; min-height: 80px; font-size: 0.8rem; font-family: var(--font-sans); resize: vertical; padding: 0.75rem;" placeholder="Company: Google&#10;Role: Software Engineer Intern&#10;Link: https://google.com/...&#10;OR paste the entire job post/email details here..."></textarea>
+            <button class="btn btn-primary" id="quick-import-btn" style="background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%); border: none; height: 80px; display: flex; flex-direction: column; justify-content: center; gap: 0.25rem;">
+              <span>✨</span>
+              <span>Parse & Add</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tracker Grid/Table container -->
+        <div class="tracker-table-container glass-card">
+          <table class="tracker-table" id="tracker-table">
+            <thead>
+              <tr>
+                <th>Company</th>
+                <th>Role Title</th>
+                <th>Type</th>
+                <th>Salary</th>
+                <th>Application Date</th>
+                <th>Link</th>
+                <th>Contact</th>
+                <th>Response</th>
+                <th>Interview Stage & Info</th>
+                <th>Offer</th>
+                <th>Notes</th>
+                <th style="text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tracker-table-body">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Resume Tab -->
+      <section class="tab-content" id="tab-resume">
+        <div class="tab-header">
+          <h2>Resume Manager</h2>
+          <p class="tab-description">Upload, view, and tailor your resume for each role</p>
+        </div>
+        <div class="resume-layout" id="resume-layout">
+          <div class="resume-upload-zone" id="resume-upload-zone">
+            <div class="upload-dropzone" id="resume-dropzone">
+              <span class="upload-icon">📎</span>
+              <h3>Upload Your Resume</h3>
+              <p>Drag & drop a PDF or DOCX file, or click to browse</p>
+              <input type="file" id="resume-file-input" accept=".pdf,.docx,.doc,.txt" hidden />
+              <button class="btn btn-secondary" id="browse-resume-btn">Browse Files</button>
+            </div>
+          </div>
+          <div class="resume-preview-area" id="resume-preview-area" style="display:none;">
+            <div class="resume-actions-bar">
+              <button class="btn btn-ghost" id="resume-reupload-btn">📎 Re-upload</button>
+              <button class="btn btn-ghost" id="resume-download-btn">⬇️ Download</button>
+              <button class="btn btn-ghost" id="resume-clear-btn">🗑️ Clear</button>
+            </div>
+            <div class="resume-content" id="resume-content">
+              <!-- Resume text rendered here -->
+            </div>
+          </div>
+          <div class="resume-tailor-panel" id="resume-tailor-panel" style="display:none;">
+            <h3>✨ Resume Tailoring</h3>
+            <p class="panel-description">Select a job from the Jobs tab to tailor your resume</p>
+            <div id="tailor-job-info"></div>
+            <div id="tailor-keywords"></div>
+            <div id="tailor-suggestions"></div>
+            <div id="tailor-prompt-output"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cover Letters Tab -->
+      <section class="tab-content" id="tab-coverletters">
+        <div class="tab-header">
+          <div class="tab-header-row">
+            <div>
+              <h2>Cover Letters</h2>
+              <p class="tab-description">Generate and manage cover letters for each application</p>
+            </div>
+            <button class="btn btn-primary" id="new-coverletter-btn">
+              <span class="btn-icon">✏️</span> New Cover Letter
+            </button>
+          </div>
+        </div>
+        <div class="coverletters-container" id="coverletters-container">
+          <div class="saved-drafts" id="coverletter-drafts">
+            <!-- Populated by JS -->
+          </div>
+          <div class="coverletter-editor" id="coverletter-editor" style="display:none;">
+            <div class="editor-header">
+              <h3 id="coverletter-editor-title">New Cover Letter</h3>
+              <div class="editor-actions">
+                <button class="btn btn-ghost" id="cl-copy-btn">📋 Copy</button>
+                <button class="btn btn-ghost" id="cl-save-btn">💾 Save</button>
+                <button class="btn btn-ghost" id="cl-close-btn">✖ Close</button>
+              </div>
+            </div>
+            <div class="editor-controls">
+              <select id="cl-template-select" class="filter-select">
+                <option value="professional">Professional</option>
+                <option value="startup">Startup-friendly</option>
+                <option value="technical">Technical Focus</option>
+              </select>
+              <select id="cl-job-select" class="filter-select">
+                <option value="">Select a job...</option>
+              </select>
+              <button class="btn btn-primary" id="cl-ai-btn" style="background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%); border: none;">✨ AI Generate</button>
+            </div>
+            <textarea id="coverletter-textarea" class="editor-textarea" placeholder="Your cover letter will appear here..."></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- Projects Tab -->
+      <section class="tab-content" id="tab-projects">
+        <div class="tab-header">
+          <h2>Project Suggestions</h2>
+          <p class="tab-description">Portfolio project ideas to strengthen your resume based on job market trends</p>
+        </div>
+        <div class="projects-filters">
+          <select id="project-category-filter" class="filter-select">
+            <option value="">All Categories</option>
+            <option value="fullstack">Full-Stack</option>
+            <option value="systems">Systems / Low-Level</option>
+            <option value="ml">ML / AI</option>
+            <option value="frontend">Frontend / UI</option>
+            <option value="devops">DevOps / Cloud</option>
+            <option value="mobile">Mobile</option>
+          </select>
+          <select id="project-difficulty-filter" class="filter-select">
+            <option value="">All Difficulties</option>
+            <option value="weekend">Weekend Project</option>
+            <option value="1week">1 Week</option>
+            <option value="2weeks">2+ Weeks</option>
+          </select>
+        </div>
+        <div class="projects-grid" id="projects-grid">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- Contacts Tab -->
+      <section class="tab-content" id="tab-contacts">
+        <div class="tab-header">
+          <div class="tab-header-row">
+            <div>
+              <h2>Contacts</h2>
+              <p class="tab-description">Import contacts from Apollo.io CSV exports</p>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" id="import-contacts-btn">
+                <span class="btn-icon">📥</span> Import CSV
+              </button>
+              <input type="file" id="contacts-csv-input" accept=".csv" hidden />
+              <button class="btn btn-ghost" id="clear-contacts-btn">🗑️ Clear All</button>
+            </div>
+          </div>
+          <div class="search-wrapper" style="margin-top: 1rem;">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="contacts-search" class="search-input" placeholder="Search contacts by name, company, title..." />
+          </div>
+        </div>
+        <div class="contacts-grid" id="contacts-grid">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- Email Drafts Tab -->
+      <section class="tab-content" id="tab-emails">
+        <div class="tab-header">
+          <div class="tab-header-row">
+            <div>
+              <h2>Email Drafts</h2>
+              <p class="tab-description">Draft and manage outreach emails</p>
+            </div>
+            <button class="btn btn-primary" id="new-email-btn">
+              <span class="btn-icon">✏️</span> New Draft
+            </button>
+          </div>
+        </div>
+        <div class="emails-container" id="emails-container">
+          <div class="saved-drafts" id="email-drafts">
+            <!-- Populated by JS -->
+          </div>
+          <div class="email-editor" id="email-editor" style="display:none;">
+            <div class="editor-header">
+              <h3 id="email-editor-title">New Email Draft</h3>
+              <div class="editor-actions">
+                <button class="btn btn-ghost" id="email-copy-btn">📋 Copy</button>
+                <button class="btn btn-ghost" id="email-mailto-btn">📧 Open in Mail</button>
+                <button class="btn btn-ghost" id="email-save-btn">💾 Save</button>
+                <button class="btn btn-ghost" id="email-close-btn">✖ Close</button>
+              </div>
+            </div>
+            <div class="editor-controls">
+              <select id="email-template-select" class="filter-select">
+                <option value="referral">Referral Request</option>
+                <option value="recruiter">Recruiter Outreach</option>
+                <option value="hiring_manager">Hiring Manager</option>
+                <option value="followup">Follow-up</option>
+              </select>
+              <select id="email-contact-select" class="filter-select">
+                <option value="">Select a contact...</option>
+              </select>
+              <select id="email-job-select" class="filter-select">
+                <option value="">Select a job...</option>
+              </select>
+              <button class="btn btn-primary" id="email-ai-btn" style="background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%); border: none;">✨ AI Generate</button>
+            </div>
+            <div class="email-fields">
+              <div class="field-group">
+                <label for="email-to">To:</label>
+                <input type="email" id="email-to" class="text-input" placeholder="recipient@company.com" />
+              </div>
+              <div class="field-group">
+                <label for="email-subject">Subject:</label>
+                <input type="text" id="email-subject" class="text-input" placeholder="Email subject line..." />
+              </div>
+            </div>
+            <textarea id="email-textarea" class="editor-textarea" placeholder="Your email draft will appear here..."></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings Tab -->
+      <section class="tab-content" id="tab-settings">
+        <div class="tab-header">
+          <h2>Settings</h2>
+          <p class="tab-description">Configure your profile and preferences</p>
+        </div>
+        <div class="settings-grid">
+          <div class="settings-card glass-card">
+            <h3>👤 Your Profile</h3>
+            <p class="settings-desc">Used to auto-fill cover letters and emails</p>
+            <div class="form-grid">
+              <div class="field-group">
+                <label for="settings-name">Full Name</label>
+                <input type="text" id="settings-name" class="text-input" placeholder="John Doe" />
+              </div>
+              <div class="field-group">
+                <label for="settings-email">Email</label>
+                <input type="email" id="settings-email" class="text-input" placeholder="john@example.com" />
+              </div>
+              <div class="field-group">
+                <label for="settings-phone">Phone</label>
+                <input type="tel" id="settings-phone" class="text-input" placeholder="(555) 123-4567" />
+              </div>
+              <div class="field-group">
+                <label for="settings-linkedin">LinkedIn URL</label>
+                <input type="url" id="settings-linkedin" class="text-input" placeholder="https://linkedin.com/in/johndoe" />
+              </div>
+              <div class="field-group">
+                <label for="settings-github">GitHub URL</label>
+                <input type="url" id="settings-github" class="text-input" placeholder="https://github.com/johndoe" />
+              </div>
+              <div class="field-group">
+                <label for="settings-portfolio">Portfolio URL</label>
+                <input type="url" id="settings-portfolio" class="text-input" placeholder="https://johndoe.dev" />
+              </div>
+            </div>
+            <button class="btn btn-primary" id="save-profile-btn">💾 Save Profile</button>
+          </div>
+
+          <div class="settings-card glass-card">
+            <h3>🔑 API Keys (Optional)</h3>
+            <p class="settings-desc">For enhanced AI-powered content generation</p>
+            <div class="form-grid">
+              <div class="field-group">
+                <label for="settings-openai-key">OpenAI API Key</label>
+                <input type="password" id="settings-openai-key" class="text-input" placeholder="sk-..." />
+              </div>
+            </div>
+            <button class="btn btn-secondary" id="save-api-keys-btn">💾 Save API Keys</button>
+          </div>
+
+          <div class="settings-card glass-card">
+            <h3>💾 Data Management</h3>
+            <p class="settings-desc">Export or import all your saved data</p>
+            <div class="btn-group">
+              <button class="btn btn-secondary" id="export-data-btn">⬇️ Export All Data</button>
+              <button class="btn btn-secondary" id="import-data-btn">⬆️ Import Data</button>
+              <input type="file" id="import-data-input" accept=".json" hidden />
+              <button class="btn btn-danger" id="clear-all-data-btn">🗑️ Clear All Data</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Toast Notifications -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Modal Overlay -->
+  <div class="modal-overlay" id="modal-overlay" style="display:none;">
+    <div class="modal glass-card" id="modal">
+      <div class="modal-header">
+        <h3 id="modal-title"></h3>
+        <button class="modal-close" id="modal-close-btn">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-footer" id="modal-footer"></div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
