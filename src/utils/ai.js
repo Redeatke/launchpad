@@ -49,7 +49,7 @@ async function callOpenAI(apiKey, systemPrompt, userPrompt) {
 }
 
 async function callGemini(apiKey, systemPrompt, userPrompt) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -82,7 +82,7 @@ async function callOpenRouter(apiKey, systemPrompt, userPrompt) {
       'X-Title': 'LaunchPad AI'
     },
     body: JSON.stringify({
-      model: 'meta-llama/llama-3.1-8b-instruct:free', // Default to a free model on OpenRouter
+      model: 'openrouter/free', // Automatically routes to the best available free model that is online
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }

@@ -113,7 +113,7 @@ function copyToClipboard() {
   window.__showToast?.('Copied to clipboard!', 'success');
 }
 
-function renderDrafts() {
+export function renderDrafts() {
   const container = document.getElementById('coverletter-drafts');
   const drafts = storage.get(DRAFTS_KEY, []);
   updateCoverLetterCount();
@@ -161,7 +161,7 @@ function deleteDraft(id) {
   window.__showToast?.('Draft deleted', 'info');
 }
 
-function updateCoverLetterCount() {
+export function updateCoverLetterCount() {
   const drafts = storage.get(DRAFTS_KEY, []);
   const badge = document.getElementById('coverletters-count');
   if (badge) badge.textContent = drafts.length;

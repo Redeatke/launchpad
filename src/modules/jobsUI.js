@@ -1,8 +1,8 @@
 // Jobs tab UI: rendering, filtering, searching
 import { fetchAllJobs, getAllCachedJobs, getJobById } from './jobsFetcher.js';
+import { callAI, getAIKeys } from '../utils/ai.js';
 import { storage } from '../utils/storage.js';
 import { esc } from '../utils/dom.js';
-import { callOpenAI, getOpenAIKey } from '../utils/openai.js';
 
 let allJobs = [];
 let filteredJobs = [];
@@ -160,15 +160,16 @@ async function openJobDetailsModal(jobId) {
   }
 
   // Load Description
-  const apiKey = getOpenAIKey();
+  const keys = getAIKeys();
+  const hasKey = keys.openai || keys.gemini || keys.openrouter;
   try {
     let descriptionHTML = '';
     
-    if (apiKey) {
+    if (hasKey) {
       const systemPrompt = `You are a professional technical recruiter. Write a highly realistic, concise, and structured job description for the given company and role. Format the output in clean, readable HTML (do not include body, html, or markdown backticks, just raw HTML tags like <h4>, <p>, <ul>, <li>). Include three sections: "About the Role", "Key Responsibilities", and "Requirements".`;
       const userPrompt = `Company: ${job.company}\nRole: ${job.role}\nLocation: ${job.location || 'Remote'}\nSource: ${job.source}\nSponsorship: ${job.noSponsorship ? 'No sponsorship supported' : 'Standard sponsorship info'}`;
       
-      const responseText = await callOpenAI(systemPrompt, userPrompt);
+      const responseText = await callAI(systemPrompt, userPrompt);
       descriptionHTML = responseText;
     } else {
       // Fallback description template
@@ -176,7 +177,7 @@ async function openJobDetailsModal(jobId) {
       descriptionHTML = `
         <div style="background: rgba(245,158,11,0.08); border: 1px dashed var(--warning); padding: 0.75rem; border-radius: var(--radius-md); font-size: 0.75rem; margin-bottom: 1.25rem; color: var(--warning); display: flex; align-items: center; gap: 0.5rem;">
           <span>💡</span>
-          <span>Tip: Add your OpenAI API Key in settings to get customized, AI-generated job requirements!</span>
+          <span>Tip: Add your AI API Key in settings to get customized, AI-generated job requirements!</span>
         </div>
         <div class="job-desc-content">
           <div class="job-desc-section">

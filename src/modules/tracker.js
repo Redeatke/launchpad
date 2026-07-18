@@ -190,86 +190,105 @@ export function openAppModal(index = null) {
     'Link to Job Advert': '', 'Application Date': new Date().toISOString().split('T')[0],
     'Contact Name': '', 'Contact Email': '', 'Contact Phone': '',
     Response: 'Nothing Yet', 'Interview Stage': '', 'Interview Date & Interviewer': '',
-    Offer: 'No', Notes: ''
+    Offer: 'No', Notes: '', JobDescription: ''
   };
 
   title.textContent = isEdit ? 'Edit Application' : 'Add Application';
   
+  // Widen modal for the side-by-side layout
+  document.getElementById('modal').style.maxWidth = '1100px';
+  
   body.innerHTML = `
-    <form id="tracker-form" class="form-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; max-height: 60vh; overflow-y: auto; padding-right: 0.5rem;">
-      <div class="field-group" style="grid-column: span 2;">
-        <label>Company *</label>
-        <input type="text" id="form-company" class="text-input" value="${esc(app.Company)}" required placeholder="e.g. Google" />
-      </div>
-      <div class="field-group">
-        <label>Role Title *</label>
-        <input type="text" id="form-role" class="text-input" value="${esc(app['Role Title'])}" required placeholder="e.g. Software Engineer" />
-      </div>
-      <div class="field-group">
-        <label>Type</label>
-        <select id="form-type" class="filter-select" style="width:100%;">
-          <option value="Internship" ${app.Type === 'Internship' ? 'selected' : ''}>Internship</option>
-          <option value="Fulltime" ${app.Type === 'Fulltime' ? 'selected' : ''}>Fulltime</option>
-          <option value="Part-time" ${app.Type === 'Part-time' ? 'selected' : ''}>Part-time</option>
-          <option value="Contract" ${app.Type === 'Contract' ? 'selected' : ''}>Contract</option>
-        </select>
-      </div>
-      <div class="field-group">
-        <label>Salary / Rate</label>
-        <input type="text" id="form-salary" class="text-input" value="${esc(app['Salary / Rate'])}" placeholder="e.g. $40/hr or $120k" />
-      </div>
-      <div class="field-group">
-        <label>Application Date</label>
-        <input type="date" id="form-date" class="text-input" value="${esc(app['Application Date'])}" />
-      </div>
-      <div class="field-group" style="grid-column: span 2;">
-        <label>Link to Job Advert</label>
-        <input type="url" id="form-link" class="text-input" value="${esc(app['Link to Job Advert'])}" placeholder="https://..." />
+    <form id="tracker-form" style="display: flex; gap: 2rem; max-height: 65vh; overflow-y: auto; padding-right: 0.5rem;">
+      <!-- Left Column: Details -->
+      <div style="flex: 1.5; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; align-content: start;">
+        <div class="field-group" style="grid-column: span 2;">
+          <label>Company *</label>
+          <input type="text" id="form-company" class="text-input" value="${esc(app.Company)}" required placeholder="e.g. Google" />
+        </div>
+        <div class="field-group">
+          <label>Role Title *</label>
+          <input type="text" id="form-role" class="text-input" value="${esc(app['Role Title'])}" required placeholder="e.g. Software Engineer" />
+        </div>
+        <div class="field-group">
+          <label>Type</label>
+          <select id="form-type" class="filter-select" style="width:100%;">
+            <option value="Internship" ${app.Type === 'Internship' ? 'selected' : ''}>Internship</option>
+            <option value="Fulltime" ${app.Type === 'Fulltime' ? 'selected' : ''}>Fulltime</option>
+            <option value="Part-time" ${app.Type === 'Part-time' ? 'selected' : ''}>Part-time</option>
+            <option value="Contract" ${app.Type === 'Contract' ? 'selected' : ''}>Contract</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Salary / Rate</label>
+          <input type="text" id="form-salary" class="text-input" value="${esc(app['Salary / Rate'])}" placeholder="e.g. $40/hr or $120k" />
+        </div>
+        <div class="field-group">
+          <label>Application Date</label>
+          <input type="date" id="form-date" class="text-input" value="${esc(app['Application Date'])}" />
+        </div>
+        <div class="field-group" style="grid-column: span 2;">
+          <label>Link to Job Advert</label>
+          <input type="url" id="form-link" class="text-input" value="${esc(app['Link to Job Advert'])}" placeholder="https://..." />
+        </div>
+        
+        <div style="grid-column: span 2; border-bottom: 1px solid var(--border-color); margin: 0.5rem 0;"></div>
+        
+        <div class="field-group">
+          <label>Contact Name</label>
+          <input type="text" id="form-contact-name" class="text-input" value="${esc(app['Contact Name'])}" placeholder="Recruiter Name" />
+        </div>
+        <div class="field-group">
+          <label>Contact Email</label>
+          <input type="email" id="form-contact-email" class="text-input" value="${esc(app['Contact Email'])}" placeholder="recruiter@company.com" />
+        </div>
+        <div class="field-group">
+          <label>Contact Phone</label>
+          <input type="text" id="form-contact-phone" class="text-input" value="${esc(app['Contact Phone'])}" placeholder="Direct phone number" />
+        </div>
+        <div class="field-group">
+          <label>Response</label>
+          <select id="form-response" class="filter-select" style="width:100%;">
+            <option value="Nothing Yet" ${app.Response === 'Nothing Yet' ? 'selected' : ''}>Nothing Yet</option>
+            <option value="Interviewing" ${app.Response === 'Interviewing' ? 'selected' : ''}>Interviewing</option>
+            <option value="Offer" ${app.Response === 'Offer' ? 'selected' : ''}>Offer</option>
+            <option value="Rejected" ${app.Response === 'Rejected' ? 'selected' : ''}>Rejected</option>
+            <option value="Ghosted" ${app.Response === 'Ghosted' ? 'selected' : ''}>Ghosted</option>
+          </select>
+        </div>
+        
+        <div class="field-group">
+          <label>Interview Stage</label>
+          <input type="text" id="form-interview-stage" class="text-input" value="${esc(app['Interview Stage'])}" placeholder="e.g. Technical Interview" />
+        </div>
+        <div class="field-group">
+          <label>Interview Date & Info</label>
+          <input type="text" id="form-interview-info" class="text-input" value="${esc(app['Interview Date & Interviewer'])}" placeholder="e.g. Mon 5th Dec, John Doe" />
+        </div>
+        <div class="field-group" style="grid-column: span 2;">
+          <label>Offer Status</label>
+          <select id="form-offer" class="filter-select" style="width:100%;">
+            <option value="No" ${app.Offer === 'No' ? 'selected' : ''}>No / Pending</option>
+            <option value="Yes" ${app.Offer === 'Yes' ? 'selected' : ''}>Yes (Offer Received)</option>
+          </select>
+        </div>
       </div>
       
-      <div style="grid-column: span 2; border-bottom: 1px solid var(--border-color); margin: 0.5rem 0;"></div>
-      
-      <div class="field-group">
-        <label>Contact Name</label>
-        <input type="text" id="form-contact-name" class="text-input" value="${esc(app['Contact Name'])}" placeholder="Recruiter Name" />
-      </div>
-      <div class="field-group">
-        <label>Contact Email</label>
-        <input type="email" id="form-contact-email" class="text-input" value="${esc(app['Contact Email'])}" placeholder="recruiter@company.com" />
-      </div>
-      <div class="field-group">
-        <label>Contact Phone</label>
-        <input type="text" id="form-contact-phone" class="text-input" value="${esc(app['Contact Phone'])}" placeholder="Direct phone number" />
-      </div>
-      <div class="field-group">
-        <label>Response</label>
-        <select id="form-response" class="filter-select" style="width:100%;">
-          <option value="Nothing Yet" ${app.Response === 'Nothing Yet' ? 'selected' : ''}>Nothing Yet</option>
-          <option value="Interviewing" ${app.Response === 'Interviewing' ? 'selected' : ''}>Interviewing</option>
-          <option value="Offer" ${app.Response === 'Offer' ? 'selected' : ''}>Offer</option>
-          <option value="Rejected" ${app.Response === 'Rejected' ? 'selected' : ''}>Rejected</option>
-          <option value="Ghosted" ${app.Response === 'Ghosted' ? 'selected' : ''}>Ghosted</option>
-        </select>
-      </div>
-      
-      <div class="field-group">
-        <label>Interview Stage</label>
-        <input type="text" id="form-interview-stage" class="text-input" value="${esc(app['Interview Stage'])}" placeholder="e.g. Technical Interview" />
-      </div>
-      <div class="field-group">
-        <label>Interview Date & Info</label>
-        <input type="text" id="form-interview-info" class="text-input" value="${esc(app['Interview Date & Interviewer'])}" placeholder="e.g. Mon 5th Dec, John Doe" />
-      </div>
-      <div class="field-group">
-        <label>Offer Status</label>
-        <select id="form-offer" class="filter-select" style="width:100%;">
-          <option value="No" ${app.Offer === 'No' ? 'selected' : ''}>No / Pending</option>
-          <option value="Yes" ${app.Offer === 'Yes' ? 'selected' : ''}>Yes (Offer Received)</option>
-        </select>
-      </div>
-      <div class="field-group" style="grid-column: span 2;">
-        <label>Notes</label>
-        <textarea id="form-notes" class="text-input" style="height: 60px; min-height:60px; resize:vertical; padding:0.5rem;" placeholder="Any extra details, deadlines, action items...">${esc(app.Notes)}</textarea>
+      <!-- Right Column: Notes & Job Desc -->
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 1rem;">
+        ${app.JobDescription ? `
+        <div style="display: flex; flex-direction: column;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">Original Job Description</label>
+            <button type="button" class="btn btn-ghost btn-sm" id="toggle-jd-btn" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;">Show</button>
+          </div>
+          <div id="jd-content" style="display: none; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem; font-size: 0.8rem; color: var(--text-secondary); max-height: 200px; overflow-y: auto; white-space: pre-wrap;">${esc(app.JobDescription)}</div>
+        </div>
+        ` : ''}
+        <div style="display: flex; flex-direction: column; flex: 1;">
+          <label style="margin-bottom: 0.5rem; display: block; font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">Notes</label>
+          <textarea id="form-notes" class="text-input" style="flex: 1; resize: none; padding: 0.75rem; height: 100%; min-height: 100px;" placeholder="Any extra details, deadlines, action items...">${esc(app.Notes)}</textarea>
+        </div>
       </div>
     </form>
   `;
@@ -281,9 +300,22 @@ export function openAppModal(index = null) {
 
   overlay.style.display = 'flex';
 
-  const closeModal = () => { overlay.style.display = 'none'; };
+  const closeModal = () => { 
+    overlay.style.display = 'none'; 
+    document.getElementById('modal').style.maxWidth = ''; // Reset width for other modals
+  };
   closeBtn.addEventListener('click', closeModal);
   footer.querySelector('.cancel-modal-btn').addEventListener('click', closeModal);
+
+  const toggleBtn = body.querySelector('#toggle-jd-btn');
+  const jdContent = body.querySelector('#jd-content');
+  if (toggleBtn && jdContent) {
+    toggleBtn.addEventListener('click', () => {
+      const isHidden = jdContent.style.display === 'none';
+      jdContent.style.display = isHidden ? 'block' : 'none';
+      toggleBtn.textContent = isHidden ? 'Hide' : 'Show';
+    });
+  }
   
   footer.querySelector('.save-modal-btn').addEventListener('click', () => {
     const form = document.getElementById('tracker-form');

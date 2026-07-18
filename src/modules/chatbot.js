@@ -3,6 +3,8 @@ import { callAI, getAIKeys } from '../utils/ai.js';
 import { getResumeText } from './resumeManager.js';
 import { getAllCachedJobs, getJobById } from './jobsFetcher.js';
 import { esc } from '../utils/dom.js';
+import { renderTracker } from './tracker.js';
+import { renderDrafts, updateCoverLetterCount } from './coverLetter.js';
 
 const CHAT_HISTORY_KEY = 'advisor_chat_history';
 
@@ -162,7 +164,37 @@ async function sendMessage() {
 
     let systemPrompt = `You are LaunchPad AI, an expert career advisor and job search assistant.
 Your goal is to provide highly actionable, direct, and supportive advice to the user based on their context.
-Always be concise, formatting answers into small digestible paragraphs or bullet points.`;
+Always be concise, formatting answers into small digestible paragraphs or bullet points.
+
+**SPECIAL CAPABILITIES (AGENTIC ACTIONS):**
+You can take actions on behalf of the user by outputting specific JSON code blocks in your response. The system will intercept these blocks and execute them.
+
+1. **Add Job to Tracker**: If the user asks you to save or track a job, output a code block exactly like this:
+\`\`\`json:add_job
+{
+  "Company": "Company Name",
+  "Role Title": "Job Title",
+  "Type": "Fulltime",
+  "Salary / Rate": "",
+  "Link to Job Advert": "",
+  "Application Date": "YYYY-MM-DD",
+  "Response": "Nothing Yet",
+  "Offer": "No",
+  "Notes": "Any extra info, deadlines, or requirements.",
+  "JobDescription": "The FULL, raw, extracted job description text goes here..."
+}
+\`\`\`
+
+2. **Draft a Cover Letter**: If the user asks you to write and save a cover letter for a job, output a code block exactly like this:
+\`\`\`json:add_cover_letter
+{
+  "company": "Company Name",
+  "role": "Job Title",
+  "text": "The full text of the cover letter here..."
+}
+\`\`\`
+
+You can include normal text before or after these blocks to explain what you did. Do NOT wrap the entire response in JSON.`;
 
     let contextData = '';
     if (resumeText) {
@@ -185,8 +217,11 @@ Always be concise, formatting answers into small digestible paragraphs or bullet
     });
     userPrompt += `USER: ${text}`;
 
-    const reply = await callAI(systemPrompt, userPrompt);
+    let reply = await callAI(systemPrompt, userPrompt);
     
+    // Parse any agentic actions in the reply
+    reply = parseAIActions(reply);
+
     // Add AI message to history
     history.push({ role: 'assistant', content: reply });
     storage.set(CHAT_HISTORY_KEY, history);
@@ -201,4 +236,60 @@ Always be concise, formatting answers into small digestible paragraphs or bullet
     sendBtn.disabled = false;
     renderHistory();
   }
+}
+
+function parseAIActions(text) {
+  let modifiedText = text;
+
+  // 1. Intercept add_job
+  const jobRegex = /```json:add_job\s*(\{[\s\S]*?\})\s*```/g;
+  modifiedText = modifiedText.replace(jobRegex, (match, jsonStr) => {
+    try {
+      const data = JSON.parse(jsonStr);
+      const apps = storage.get('job_applications', []);
+      apps.push(data);
+      storage.set('job_applications', apps);
+      renderTracker();
+      
+      return `
+        <div style="background: rgba(46, 204, 113, 0.1); border: 1px solid var(--success); border-radius: 8px; padding: 0.75rem; margin-top: 0.5rem; font-size: 0.9rem;">
+          <strong style="color: var(--success);">✅ Job Saved to Tracker</strong><br/>
+          Added <strong>${esc(data['Role Title'])}</strong> at <strong>${esc(data.Company)}</strong>.
+        </div>
+      `;
+    } catch (e) {
+      console.error("Failed to parse add_job JSON", e);
+      return `*[Failed to save job: Invalid JSON format]*`;
+    }
+  });
+
+  // 2. Intercept add_cover_letter
+  const clRegex = /```json:add_cover_letter\s*(\{[\s\S]*?\})\s*```/g;
+  modifiedText = modifiedText.replace(clRegex, (match, jsonStr) => {
+    try {
+      const data = JSON.parse(jsonStr);
+      const drafts = storage.get('coverletter_drafts', []);
+      drafts.unshift({
+        id: 'cl_' + Date.now(),
+        company: data.company,
+        role: data.role,
+        text: data.text,
+        createdAt: new Date().toISOString()
+      });
+      storage.set('coverletter_drafts', drafts);
+      renderDrafts();
+      
+      return `
+        <div style="background: rgba(168, 85, 247, 0.1); border: 1px solid var(--primary); border-radius: 8px; padding: 0.75rem; margin-top: 0.5rem; font-size: 0.9rem;">
+          <strong style="color: var(--primary);">📝 Cover Letter Saved</strong><br/>
+          Added draft for <strong>${esc(data.company)}</strong> to your Cover Letters tab.
+        </div>
+      `;
+    } catch (e) {
+      console.error("Failed to parse add_cover_letter JSON", e);
+      return `*[Failed to save cover letter: Invalid JSON format]*`;
+    }
+  });
+
+  return modifiedText;
 }
