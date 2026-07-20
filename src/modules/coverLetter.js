@@ -132,17 +132,23 @@ export function renderDrafts() {
       <div class="draft-card-title">${esc(d.company)}${d.role ? ' — ' + esc(d.role) : ''}</div>
       <div class="draft-card-meta">${new Date(d.createdAt).toLocaleDateString()}</div>
       <div class="draft-card-actions">
-        <button class="btn btn-ghost btn-sm cl-load-btn" data-id="${d.id}">Open</button>
         <button class="btn btn-ghost btn-sm cl-delete-btn" data-id="${d.id}">🗑️</button>
       </div>
     </div>
   `).join('');
 
-  container.querySelectorAll('.cl-load-btn').forEach(btn => {
-    btn.addEventListener('click', () => loadDraft(btn.dataset.id));
+  container.querySelectorAll('.draft-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (!e.target.closest('.cl-delete-btn')) {
+        loadDraft(card.dataset.id);
+      }
+    });
   });
   container.querySelectorAll('.cl-delete-btn').forEach(btn => {
-    btn.addEventListener('click', () => deleteDraft(btn.dataset.id));
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      deleteDraft(btn.dataset.id);
+    });
   });
 }
 

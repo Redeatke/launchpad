@@ -144,17 +144,23 @@ function renderDrafts() {
       <div class="draft-card-title">${esc(d.subject || 'Untitled')}</div>
       <div class="draft-card-meta">To: ${esc(d.to || 'N/A')} · ${new Date(d.createdAt).toLocaleDateString()}</div>
       <div class="draft-card-actions">
-        <button class="btn btn-ghost btn-sm email-load-btn" data-id="${d.id}">Open</button>
         <button class="btn btn-ghost btn-sm email-delete-btn" data-id="${d.id}">🗑️</button>
       </div>
     </div>
   `).join('');
 
-  container.querySelectorAll('.email-load-btn').forEach(btn => {
-    btn.addEventListener('click', () => loadDraft(btn.dataset.id));
+  container.querySelectorAll('.draft-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (!e.target.closest('.email-delete-btn')) {
+        loadDraft(card.dataset.id);
+      }
+    });
   });
   container.querySelectorAll('.email-delete-btn').forEach(btn => {
-    btn.addEventListener('click', () => deleteDraft(btn.dataset.id));
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      deleteDraft(btn.dataset.id);
+    });
   });
 }
 
