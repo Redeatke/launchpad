@@ -104,14 +104,24 @@ export function renderTracker() {
           ${app['Contact Name'] ? `<span title="${esc(app['Contact Email'])} / ${esc(app['Contact Phone'])}">${esc(app['Contact Name'])}</span>` : '—'}
         </td>
         <td>
-          <span class="status-pill ${resClass}">${esc(app.Response || 'Nothing Yet')}</span>
+          <select class="status-pill inline-select ${resClass}" data-idx="${idx}" data-field="Response">
+            <option value="Nothing Yet" ${app.Response === 'Nothing Yet' || !app.Response ? 'selected' : ''}>Nothing Yet</option>
+            <option value="Interviewing" ${app.Response === 'Interviewing' ? 'selected' : ''}>Interviewing</option>
+            <option value="Offer" ${app.Response === 'Offer' ? 'selected' : ''}>Offer</option>
+            <option value="Rejected" ${app.Response === 'Rejected' ? 'selected' : ''}>Rejected</option>
+            <option value="Ghosted" ${app.Response === 'Ghosted' ? 'selected' : ''}>Ghosted</option>
+          </select>
         </td>
         <td>
           ${app['Interview Stage'] ? `<span style="font-weight: 500;">${esc(app['Interview Stage'])}</span>` : ''}
           ${app['Interview Date & Interviewer'] ? `<br/><span style="font-size: 0.7rem; color: var(--text-muted);">${esc(app['Interview Date & Interviewer'])}</span>` : (app['Interview Stage'] ? '' : '—')}
         </td>
         <td>
-          <span class="status-pill ${offerClass}">${esc(app.Offer || 'No')}</span>
+          <select class="status-pill inline-select ${offerClass}" data-idx="${idx}" data-field="Offer">
+            <option value="Pending" ${app.Offer === 'Pending' || !app.Offer ? 'selected' : ''}>Pending</option>
+            <option value="No" ${app.Offer === 'No' ? 'selected' : ''}>No</option>
+            <option value="Yes" ${app.Offer === 'Yes' ? 'selected' : ''}>Offer Received</option>
+          </select>
         </td>
         <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis;" title="${esc(app.Notes)}">
           ${esc(app.Notes) || '—'}
@@ -130,6 +140,22 @@ export function renderTracker() {
   });
   tbody.querySelectorAll('.delete-app-btn').forEach(btn => {
     btn.addEventListener('click', () => deleteApplication(parseInt(btn.dataset.idx)));
+  });
+  
+  // Attach inline select listeners
+  tbody.querySelectorAll('.inline-select').forEach(select => {
+    select.addEventListener('change', (e) => {
+      const idx = parseInt(e.target.dataset.idx);
+      const field = e.target.dataset.field;
+      const value = e.target.value;
+      
+      let apps = storage.get(TRACKER_KEY, []);
+      if (apps[idx]) {
+        apps[idx][field] = value;
+        storage.set(TRACKER_KEY, apps);
+        renderTracker();
+      }
+    });
   });
 }
 

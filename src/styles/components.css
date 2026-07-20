@@ -172,6 +172,25 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+select.status-pill.inline-select {
+  appearance: none;
+  cursor: pointer;
+  padding-right: 1.25rem;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.35rem center;
+  background-size: 0.75rem;
+}
+select.status-pill.inline-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary);
+}
+select.status-pill.inline-select option {
+  background: var(--bg-card, #1e1e2d);
+  color: var(--text-primary, #ffffff);
+  font-weight: normal;
+  text-transform: none;
+}
 .status-pill.awaiting {
   background: rgba(59, 130, 246, 0.15);
   color: var(--info);

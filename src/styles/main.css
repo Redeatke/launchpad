@@ -295,6 +295,7 @@ a:hover { color: var(--text-accent); }
   transition: all var(--transition-base);
 }
 .text-input:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15); }
+.text-input option { background: var(--bg-card, #1e1e2d); color: var(--text-primary, #ffffff); }
 .btn-group { display: flex; gap: 0.75rem; flex-wrap: wrap; }
 
 /* ===== Toast ===== */
