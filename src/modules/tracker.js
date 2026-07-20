@@ -172,6 +172,7 @@ function getResponseClass(res) {
 function getOfferClass(offer) {
   if (offer === 'Yes') return 'offer';
   if (offer === 'No') return 'rejected';
+  if (offer === 'Pending') return 'interviewing';
   return 'awaiting';
 }
 
@@ -190,7 +191,7 @@ export function openAppModal(index = null) {
     'Link to Job Advert': '', 'Application Date': new Date().toISOString().split('T')[0],
     'Contact Name': '', 'Contact Email': '', 'Contact Phone': '',
     Response: 'Nothing Yet', 'Interview Stage': '', 'Interview Date & Interviewer': '',
-    Offer: 'No', Notes: '', JobDescription: ''
+    Offer: 'Pending', Notes: '', JobDescription: ''
   };
 
   title.textContent = isEdit ? 'Edit Application' : 'Add Application';
@@ -268,7 +269,8 @@ export function openAppModal(index = null) {
         <div class="field-group" style="grid-column: span 2;">
           <label>Offer Status</label>
           <select id="form-offer" class="filter-select" style="width:100%;">
-            <option value="No" ${app.Offer === 'No' ? 'selected' : ''}>No / Pending</option>
+            <option value="Pending" ${app.Offer === 'Pending' || !app.Offer ? 'selected' : ''}>Pending</option>
+            <option value="No" ${app.Offer === 'No' ? 'selected' : ''}>No</option>
             <option value="Yes" ${app.Offer === 'Yes' ? 'selected' : ''}>Yes (Offer Received)</option>
           </select>
         </div>
@@ -502,7 +504,7 @@ function importMappedData(rows) {
           Response: getVal(['Response', 'Status']) || 'Nothing Yet',
           'Interview Stage': getVal(['Interview Stage', 'Stage']),
           'Interview Date & Interviewer': getVal(['Interview Date & Interviewer', 'Interview Info']),
-          Offer: getVal(['Offer', 'Offer Status']) || 'No',
+          Offer: getVal(['Offer', 'Offer Status']) || 'Pending',
           Notes: getVal(['Notes', 'Note', 'Comments'])
         });
         addedCount++;
@@ -567,7 +569,7 @@ async function handleQuickImport() {
   "Response": "Nothing Yet",
   "Interview Stage": "",
   "Interview Date & Interviewer": "",
-  "Offer": "No",
+  "Offer": "Pending",
   "Notes": "Summary of requirements, location, visa sponsorships, or deadlines"
 }`;
 

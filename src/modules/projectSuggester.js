@@ -109,9 +109,17 @@ Format of objects:
     const userPrompt = `USER RESUME:\n${resumeText || 'No resume provided.'}\n\nTARGET ROLES (Based on job applications):\n${targetRoles}\n\nGenerate 5 personalized projects. Return ONLY the JSON array.`;
 
     let response = await callAI(systemPrompt, userPrompt);
-    response = response.replace(/^[\s\S]*?\[/, '[').replace(/\][\s\S]*$/, ']').trim();
     
-    const newProjects = JSON.parse(response);
+    const jsonMatch = response.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    let jsonStr = jsonMatch ? jsonMatch[1] : response;
+    
+    const startIdx = jsonStr.indexOf('[');
+    const endIdx = jsonStr.lastIndexOf(']');
+    if (startIdx !== -1 && endIdx !== -1 && endIdx >= startIdx) {
+      jsonStr = jsonStr.substring(startIdx, endIdx + 1);
+    }
+    
+    const newProjects = JSON.parse(jsonStr);
     if (!Array.isArray(newProjects) || newProjects.length === 0) {
       throw new Error("Invalid response format");
     }

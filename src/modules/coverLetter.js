@@ -12,6 +12,8 @@ export function initCoverLetterTab() {
   const newBtn = document.getElementById('new-coverletter-btn');
   const saveBtn = document.getElementById('cl-save-btn');
   const copyBtn = document.getElementById('cl-copy-btn');
+  const wordBtn = document.getElementById('cl-word-btn');
+  const pdfBtn = document.getElementById('cl-pdf-btn');
   const closeBtn = document.getElementById('cl-close-btn');
   const templateSelect = document.getElementById('cl-template-select');
   const jobSelect = document.getElementById('cl-job-select');
@@ -20,6 +22,8 @@ export function initCoverLetterTab() {
   newBtn.addEventListener('click', openEditor);
   saveBtn.addEventListener('click', saveDraft);
   copyBtn.addEventListener('click', copyToClipboard);
+  wordBtn?.addEventListener('click', exportToWord);
+  pdfBtn?.addEventListener('click', exportToPDF);
   closeBtn.addEventListener('click', closeEditor);
   templateSelect.addEventListener('change', regenerate);
   jobSelect.addEventListener('change', regenerate);
@@ -248,4 +252,46 @@ Please write a custom cover letter tailored to this job and highlighting the mos
   }
 }
 
+function exportToWord() {
+  const text = document.getElementById('coverletter-textarea').value;
+  if (!text) return window.__showToast?.('Nothing to export!', 'error');
+
+  const preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Cover Letter</title></head><body>";
+  const postHtml = "</body></html>";
+  const html = preHtml + text.replace(/\n/g, '<br>') + postHtml;
+
+  const blob = new Blob(['\\ufeff', html], { type: 'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  
+  const jobId = document.getElementById('cl-job-select').value;
+  const job = jobId ? getJobById(jobId) : null;
+  const company = job?.company || 'General';
+  
+  a.download = `Cover_Letter_${company.replace(/\\s+/g, '_')}.doc`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  window.__showToast?.('Exported to Word!', 'success');
+}
+
+function exportToPDF() {
+  const text = document.getElementById('coverletter-textarea').value;
+  if (!text) return window.__showToast?.('Nothing to export!', 'error');
+
+  const printWindow = window.open('', '', 'height=800,width=800');
+  printWindow.document.write('<html><head><title>Cover Letter</title>');
+  printWindow.document.write('<style>body { font-family: Arial, sans-serif; font-size: 11pt; line-height: 1.5; padding: 40px; white-space: pre-wrap; }</style>');
+  printWindow.document.write('</head><body>');
+  printWindow.document.write(text.replace(/</g, '&lt;').replace(/>/g, '&gt;'));
+  printWindow.document.write('</body></html>');
+  printWindow.document.close();
+  printWindow.focus();
+  setTimeout(() => {
+    printWindow.print();
+    printWindow.close();
+  }, 250);
+}
 
